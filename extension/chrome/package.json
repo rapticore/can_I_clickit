@@ -1,0 +1,17 @@
+{
+  "name": "can-i-click-it-extension",
+  "version": "1.0.0",
+  "description": "Can I Click It? — AI-Powered Personal Safety Assistant browser extension",
+  "private": true,
+  "scripts": {
+    "build": "tsc && npm run copy-assets",
+    "copy-assets": "cp manifest.json dist/ && cp -r styles dist/ && cp -r icons dist/ && cp popup/popup.html dist/popup/",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@types/chrome": "^0.0.287"
+  }
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Can I Click It?</title>
+  <link rel="stylesheet" href="../styles/popup.css">
+</head>
+<body>
+  <div class="popup">
+    <header class="popup__header">
+      <div class="popup__brand">
+        <span class="popup__logo">🛡️</span>
+        <h1 class="popup__title">Can I Click It?</h1>
+      </div>
+      <span class="popup__tagline">A seatbelt for the internet</span>
+    </header>
+
+    <section class="popup__trust" id="trust-section">
+      <div class="popup__score-ring" id="score-ring">
+        <svg viewBox="0 0 100 100" class="popup__score-svg">
+          <circle cx="50" cy="50" r="42" class="popup__score-track"></circle>
+          <circle cx="50" cy="50" r="42" class="popup__score-fill" id="score-circle"></circle>
+        </svg>
+        <div class="popup__score-value" id="score-value">—</div>
+      </div>
+      <div class="popup__trust-info">
+        <div class="popup__verdict" id="verdict-label">Scanning…</div>
+        <div class="popup__domain" id="domain-label"></div>
+      </div>
+    </section>
+
+    <section class="popup__details" id="details-section">
+      <div class="popup__detail-row">
+        <span class="popup__detail-label">Domain Age</span>
+        <span class="popup__detail-value" id="domain-age">—</span>
+      </div>
+      <div class="popup__detail-row">
+        <span class="popup__detail-label">SSL Certificate</span>
+        <span class="popup__detail-value" id="ssl-status">—</span>
+      </div>
+      <div class="popup__detail-row">
+        <span class="popup__detail-label">Last Scan</span>
+        <span class="popup__detail-value" id="last-scan">—</span>
+      </div>
+    </section>
+
+    <section class="popup__summary" id="summary-section">
+      <p class="popup__summary-text" id="summary-text"></p>
+    </section>
+
+    <section class="popup__usage">
+      <div class="popup__usage-bar">
+        <div class="popup__usage-fill" id="usage-fill"></div>
+      </div>
+      <div class="popup__usage-label" id="usage-label">— scans remaining today</div>
+    </section>
+
+    <footer class="popup__footer">
+      <a href="https://app.caniclickit.com/recovery" target="_blank" rel="noopener" class="popup__footer-link">
+        I already clicked something bad →
+      </a>
+      <a href="https://app.caniclickit.com" target="_blank" rel="noopener" class="popup__footer-link popup__footer-link--secondary">
+        Open full app
+      </a>
+    </footer>
+  </div>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

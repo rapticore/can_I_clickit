@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Can I Click It?",
+  "version": "1.0.0",
+  "description": "AI-Powered Personal Safety Assistant — A seatbelt for the internet. Instantly analyze links for phishing, scams, and threats before you click.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "alarms"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content-script.js"],
+      "css": [],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    },
+    "default_title": "Can I Click It?"
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["styles/tooltip.css", "styles/interstitial.css"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "host_permissions": [
+    "http://localhost:8880/*",
+    "https://api.caniclickit.com/*"
+  ]
+}

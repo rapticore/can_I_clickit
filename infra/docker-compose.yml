@@ -1,0 +1,122 @@
+services:
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    ports:
+      - "8880:8000"
+    environment:
+      CLICKIT_DEBUG: "true"
+      CLICKIT_DATABASE_URL: postgresql+asyncpg://clickit:clickit@postgres:5432/clickit
+      CLICKIT_REDIS_URL: redis://redis:6379/0
+      CLICKIT_ELASTICSEARCH_URL: http://elasticsearch:9200
+      CLICKIT_API_KEYS: '["dev-key-12345"]'
+      CLICKIT_CORS_ORIGINS: '["http://localhost:3007"]'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
+    volumes:
+      - ../backend/app:/app/app
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3007:3000"
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8880
+      NEXT_PUBLIC_API_KEY: dev-key-12345
+    depends_on:
+      api:
+        condition: service_started
+    volumes:
+      - ../frontend:/app
+      - frontend_node_modules:/app/node_modules
+    restart: unless-stopped
+
+  api-tests:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    environment:
+      CLICKIT_DEBUG: "true"
+      CLICKIT_DATABASE_URL: postgresql+asyncpg://clickit:clickit@postgres:5432/clickit
+      CLICKIT_TEST_DATABASE_URL: postgresql+asyncpg://clickit:clickit@postgres:5432/clickit
+      CLICKIT_REDIS_URL: redis://redis:6379/0
+      CLICKIT_ELASTICSEARCH_URL: http://elasticsearch:9200
+      CLICKIT_API_KEYS: '["dev-key-12345"]'
+      CLICKIT_CORS_ORIGINS: '["http://localhost:3007"]'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["pytest", "-q", "tests"]
+    volumes:
+      - ../backend:/app
+    profiles: ["test"]
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: clickit
+      POSTGRES_PASSWORD: clickit
+      POSTGRES_DB: clickit
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clickit -d clickit"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/var/lib/elasticsearch/data
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+    restart: unless-stopped
+
+volumes:
+  frontend_node_modules:
+  pgdata:
+  esdata:
+  miniodata:

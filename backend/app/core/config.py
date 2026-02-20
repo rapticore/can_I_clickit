@@ -1,0 +1,54 @@
+from functools import lru_cache
+
+from pydantic import field_validator
+from pydantic_settings import BaseSettings
+
+
+class Settings(BaseSettings):
+    app_name: str = "Can I Click It?"
+    app_version: str = "1.0.0"
+    debug: bool = False
+
+    database_url: str = "postgresql+asyncpg://clickit:clickit@localhost:5432/clickit"
+    redis_url: str = "redis://localhost:6379/0"
+    elasticsearch_url: str = "http://localhost:9200"
+
+    api_key_header: str = "X-API-Key"
+    api_keys: list[str] = []
+
+    anthropic_api_key: str = ""
+    anthropic_model_fast: str = "claude-3-5-haiku-20241022"
+    anthropic_model_complex: str = "claude-sonnet-4-20250514"
+
+    virustotal_api_key: str = ""
+    phishtank_api_key: str = ""
+
+    free_tier_daily_scans: int = 5
+    cache_ttl_seconds: int = 2592000  # 30 days
+
+    enable_live_link_checks: bool = False
+    max_live_url_lookups: int = 2
+
+    cors_origins: list[str] = ["*"]
+
+    aws_region: str = "us-east-1"
+    s3_bucket: str = "clickit-data"
+
+    log_level: str = "INFO"
+
+    model_config = {"env_file": ".env", "env_prefix": "CLICKIT_"}
+
+    @field_validator("database_url")
+    @classmethod
+    def validate_database_url(cls, value: str) -> str:
+        normalized = value.lower()
+        if normalized.startswith("sqlite"):
+            raise ValueError("SQLite is not supported. Configure CLICKIT_DATABASE_URL to PostgreSQL.")
+        if not normalized.startswith("postgresql+asyncpg://"):
+            raise ValueError("Only postgresql+asyncpg URLs are supported for CLICKIT_DATABASE_URL.")
+        return value
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

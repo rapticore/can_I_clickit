@@ -1,0 +1,562 @@
+{
+  "categories": {
+    "credential_theft": {
+      "title": "Password Compromised",
+      "urgency": "high",
+      "opening_message": "Don't worry — let's fix this together. Let's secure your accounts right away.",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Change the compromised password immediately",
+          "description": "Go to the real website of the service (type the URL yourself) and change your password to something new and unique.",
+          "help_detail": "Use a password that is at least 12 characters long with a mix of letters, numbers, and symbols. Do not reuse passwords across sites.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 2,
+          "title": "Enable two-factor authentication",
+          "description": "Turn on two-factor authentication (2FA) on the compromised account and any account that used the same password.",
+          "help_detail": "2FA adds an extra step when logging in, like a code sent to your phone. This makes it much harder for someone else to access your account even if they have your password.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 3,
+          "title": "Check for unauthorized activity",
+          "description": "Review recent activity on the compromised account. Look for logins you don't recognize, messages you didn't send, or settings changes you didn't make.",
+          "help_detail": "Most services have a 'Recent Activity' or 'Security' section in settings where you can see login history.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 4,
+          "title": "Change password on other accounts using the same password",
+          "description": "If you used the same password on other accounts, change those passwords now too.",
+          "help_detail": "Attackers often try stolen passwords on many popular services like email, banking, and social media.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 5,
+          "title": "Monitor your accounts for the next 30 days",
+          "description": "Keep an eye on your accounts over the next month for any unusual activity.",
+          "help_detail": "Set up login alerts if the service offers them. This will notify you whenever someone logs into your account.",
+          "action_type": "info"
+        }
+      ],
+      "quick_dial_contacts": []
+    },
+    "financial_fraud": {
+      "title": "Financial Information Exposed",
+      "urgency": "critical",
+      "opening_message": "Don't worry — let's fix this together. Time is important, so let's start with the most urgent step.",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Call your bank or credit card company immediately",
+          "description": "Report the incident and ask them to freeze or block the compromised card or account.",
+          "help_detail": "The number is on the back of your card or on your bank statement. Tell them you may have shared your information with a fraudulent website.",
+          "action_type": "call",
+          "action_data": {"label": "Call Your Bank"}
+        },
+        {
+          "step_number": 2,
+          "title": "Monitor your account for unauthorized transactions",
+          "description": "Check your recent transactions and report any you don't recognize to your bank.",
+          "help_detail": "Your bank may be able to reverse unauthorized charges if reported quickly.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 3,
+          "title": "Place a fraud alert on your credit report",
+          "description": "Contact one of the three credit bureaus to place a fraud alert. They will notify the other two.",
+          "help_detail": "Call Equifax (800-525-6285), Experian (888-397-3742), or TransUnion (800-680-7289).",
+          "action_type": "call",
+          "action_data": {"label": "Call Equifax", "phone": "800-525-6285"}
+        },
+        {
+          "step_number": 4,
+          "title": "Report the fraud to the FTC",
+          "description": "File a report at reportfraud.ftc.gov or call 877-382-4357.",
+          "help_detail": "The FTC report creates an official record and can help with disputing fraudulent charges.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 5,
+          "title": "Change online banking passwords",
+          "description": "Update your passwords for online banking and any financial apps.",
+          "help_detail": "Use a strong, unique password and enable two-factor authentication if available.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 6,
+          "title": "Continue monitoring for 90 days",
+          "description": "Watch your accounts and credit reports closely for the next 3 months.",
+          "help_detail": "Consider signing up for free credit monitoring through your bank or a service like Credit Karma.",
+          "action_type": "info"
+        }
+      ],
+      "quick_dial_contacts": [
+        {"name": "Equifax Fraud", "phone": "800-525-6285", "description": "Credit bureau fraud alert"},
+        {"name": "Experian Fraud", "phone": "888-397-3742", "description": "Credit bureau fraud alert"},
+        {"name": "TransUnion Fraud", "phone": "800-680-7289", "description": "Credit bureau fraud alert"},
+        {"name": "FTC", "phone": "877-382-4357", "description": "Federal Trade Commission"}
+      ]
+    },
+    "identity_theft": {
+      "title": "Personal Information Exposed",
+      "urgency": "critical",
+      "opening_message": "Don't worry — let's fix this together. Protecting your identity is the priority.",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Place a credit freeze with all three bureaus",
+          "description": "A credit freeze prevents anyone from opening new accounts in your name.",
+          "help_detail": "Contact Equifax (800-525-6285), Experian (888-397-3742), and TransUnion (800-680-7289). A freeze is free and does not affect your credit score.",
+          "action_type": "call",
+          "action_data": {"label": "Call Equifax", "phone": "800-525-6285"}
+        },
+        {
+          "step_number": 2,
+          "title": "Report identity theft to the FTC",
+          "description": "Visit IdentityTheft.gov to file an official report and get a personalized recovery plan.",
+          "help_detail": "The FTC report is an official document that can help you dispute fraudulent accounts.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 3,
+          "title": "Contact the Social Security Administration if SSN was shared",
+          "description": "Call the SSA at 800-772-1213 to report potential misuse of your Social Security number.",
+          "help_detail": "The SSA can flag your account and help you monitor for fraudulent use.",
+          "action_type": "call",
+          "action_data": {"label": "Call SSA", "phone": "800-772-1213"}
+        },
+        {
+          "step_number": 4,
+          "title": "File a police report",
+          "description": "Contact your local police department and file a report. Keep the report number.",
+          "help_detail": "A police report can help when disputing fraudulent accounts with creditors.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 5,
+          "title": "Monitor your credit and accounts for 90 days",
+          "description": "Check your credit reports weekly and watch for any accounts or inquiries you don't recognize.",
+          "help_detail": "You can get free weekly credit reports at AnnualCreditReport.com.",
+          "action_type": "info"
+        }
+      ],
+      "quick_dial_contacts": [
+        {"name": "Equifax Fraud", "phone": "800-525-6285", "description": "Credit freeze"},
+        {"name": "Experian Fraud", "phone": "888-397-3742", "description": "Credit freeze"},
+        {"name": "TransUnion Fraud", "phone": "800-680-7289", "description": "Credit freeze"},
+        {"name": "SSA", "phone": "800-772-1213", "description": "Social Security Administration"},
+        {"name": "FTC", "phone": "877-382-4357", "description": "Federal Trade Commission"}
+      ]
+    },
+    "malware_download": {
+      "title": "Suspicious Download",
+      "urgency": "high",
+      "opening_message": "Don't worry — let's fix this together. Let's secure your device first.",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Disconnect from the internet",
+          "description": "Turn off Wi-Fi and mobile data on the affected device to prevent the software from communicating with attackers.",
+          "help_detail": "You can also enable airplane mode. This stops any malware from sending your data or downloading more harmful files.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 2,
+          "title": "Delete the downloaded file",
+          "description": "Find and delete the file you downloaded. Check your Downloads folder.",
+          "help_detail": "On iPhone, check Files app. On Android, check Downloads folder. On a computer, check your Downloads folder and also empty the trash/recycle bin.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 3,
+          "title": "Run a device security scan",
+          "description": "Use your device's built-in security scanner or a trusted antivirus app to scan for threats.",
+          "help_detail": "On Android, open Google Play Protect from the Play Store. On iPhone, Apple's built-in protections are automatic. On a computer, run Windows Defender or your installed antivirus.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 4,
+          "title": "Update your device software",
+          "description": "Install any available updates for your operating system and apps.",
+          "help_detail": "Updates often contain security fixes that protect against known threats.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 5,
+          "title": "Change important passwords from a different device",
+          "description": "Using a different, clean device, change passwords for your email, banking, and other important accounts.",
+          "help_detail": "If the downloaded file was malware, it may have captured passwords you typed on the affected device.",
+          "action_type": "info"
+        }
+      ],
+      "quick_dial_contacts": []
+    },
+    "gift_card_wire": {
+      "title": "Money Sent to Scammer",
+      "urgency": "critical",
+      "opening_message": "Don't worry — let's fix this together. Let's see if we can recover any of the funds.",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Contact the gift card issuer or payment provider immediately",
+          "description": "If you sent gift cards, call the number on the back of the card and report the fraud. If you sent a wire transfer, contact your bank or the wire service.",
+          "help_detail": "Some gift card companies may be able to freeze remaining funds. For wire transfers, contact your bank immediately — there is sometimes a short window to reverse transfers.",
+          "action_type": "call",
+          "action_data": {"label": "Call Your Bank"}
+        },
+        {
+          "step_number": 2,
+          "title": "Save all evidence",
+          "description": "Keep the gift cards, receipts, any messages or emails from the scammer, and records of the transaction.",
+          "help_detail": "This evidence will be needed for filing reports with law enforcement and the FTC.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 3,
+          "title": "File a report with the FTC",
+          "description": "Report the scam at reportfraud.ftc.gov.",
+          "help_detail": "The FTC uses reports to build cases against scammers and alert others about emerging scam types.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 4,
+          "title": "File a police report",
+          "description": "Contact your local police and file a report. Keep the case number.",
+          "help_detail": "While recovery of gift card funds is difficult, police reports create an official record.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 5,
+          "title": "Report to the FBI's IC3",
+          "description": "File a report at ic3.gov if the total amount lost exceeds $1,000.",
+          "help_detail": "The Internet Crime Complaint Center tracks and investigates internet fraud.",
+          "action_type": "info"
+        }
+      ],
+      "quick_dial_contacts": [
+        {"name": "FTC", "phone": "877-382-4357", "description": "Federal Trade Commission"}
+      ]
+    },
+    "remote_access": {
+      "title": "Device Remote Access Given",
+      "urgency": "critical",
+      "opening_message": "Don't worry — let's fix this together. Let's secure your device immediately.",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Disconnect from the internet immediately",
+          "description": "Turn off Wi-Fi and mobile data. This cuts the attacker's access to your device.",
+          "help_detail": "Pull the ethernet cable if on a desktop. Enable airplane mode on a phone or tablet.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 2,
+          "title": "Uninstall the remote access software",
+          "description": "Remove any remote access applications that were installed (AnyDesk, TeamViewer, LogMeIn, etc.).",
+          "help_detail": "On a phone, long-press the app icon and uninstall. On a computer, go to Settings > Apps and uninstall.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 3,
+          "title": "Change all passwords from a different, clean device",
+          "description": "Using a different device, change passwords for your email, banking, social media, and any other important accounts.",
+          "help_detail": "The attacker may have seen or captured passwords while they had access to your device. Start with email and banking.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 4,
+          "title": "Call your bank",
+          "description": "If you accessed any financial services while the attacker had remote access, call your bank to report it.",
+          "help_detail": "The attacker may have seen account numbers, balances, or login credentials.",
+          "action_type": "call",
+          "action_data": {"label": "Call Your Bank"}
+        },
+        {
+          "step_number": 5,
+          "title": "Run a full security scan",
+          "description": "Reconnect to the internet and run a full antivirus scan of your device.",
+          "help_detail": "The attacker may have installed additional software during their access.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 6,
+          "title": "Consider a factory reset",
+          "description": "For maximum safety, consider performing a factory reset of the affected device.",
+          "help_detail": "A factory reset removes everything the attacker may have installed. Back up important files first if possible (use a different device to verify they are not infected).",
+          "action_type": "info"
+        }
+      ],
+      "quick_dial_contacts": []
+    },
+    "general_unknown": {
+      "title": "General Safety Precautions",
+      "urgency": "medium",
+      "opening_message": "Don't worry — let's fix this together. Let's take some precautionary steps.",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Change your most important passwords",
+          "description": "Start with your email, then banking and financial accounts, then social media.",
+          "help_detail": "Use a unique, strong password for each account. Consider using a password manager.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 2,
+          "title": "Enable two-factor authentication",
+          "description": "Turn on 2FA on your email and banking accounts.",
+          "help_detail": "This adds an extra security layer that protects your accounts even if someone has your password.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 3,
+          "title": "Monitor your accounts",
+          "description": "Check your email, bank, and social media accounts for any unusual activity over the next few weeks.",
+          "help_detail": "Look for logins you don't recognize, messages you didn't send, or charges you didn't make.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 4,
+          "title": "Run a device security scan",
+          "description": "Use your device's built-in security features to scan for threats.",
+          "help_detail": "On Android, use Google Play Protect. On a computer, run your antivirus software.",
+          "action_type": "info"
+        }
+      ],
+      "quick_dial_contacts": []
+    },
+    "blackmail_sextortion": {
+      "title": "Blackmail or Sextortion Email",
+      "urgency": "medium",
+      "opening_message": "Don't worry — these emails are almost always bluffs. Let's walk through what to do.",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Do not pay",
+          "description": "These emails are almost always mass-sent bluffs. The sender typically does not have the data or footage they claim. Paying encourages further extortion and does not guarantee the threats will stop.",
+          "help_detail": "These scammers send the same threatening email to thousands of people hoping a few will pay out of fear. The vast majority have no actual compromising material.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 2,
+          "title": "Do not reply or engage",
+          "description": "Any response confirms your email is active and may lead to escalated demands.",
+          "help_detail": "Scammers track which emails get responses. Replying — even to say 'leave me alone' — tells them they have a responsive target.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 3,
+          "title": "Check if a password was included",
+          "description": "If the email includes one of your passwords, it likely came from an old data breach. Change that password immediately on any account where you still use it.",
+          "help_detail": "You can check if your email has been in a data breach at haveibeenpwned.com.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 4,
+          "title": "Enable two-factor authentication",
+          "description": "Turn on 2FA for your email and any accounts referenced in the message.",
+          "help_detail": "This prevents anyone from accessing your accounts even if they have an old password.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 5,
+          "title": "Mark the email as spam/phishing",
+          "description": "Mark the email as spam or phishing in your email client to help train filters.",
+          "help_detail": "In Gmail, click the three dots and select 'Report phishing.' In Outlook, use 'Report message' > 'Phishing.'",
+          "action_type": "info"
+        },
+        {
+          "step_number": 6,
+          "title": "Report the email",
+          "description": "Report to the FTC (reportfraud.ftc.gov) and the FBI's IC3 (ic3.gov) if financial demands were made.",
+          "help_detail": "Reporting helps authorities track and shut down these operations.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 7,
+          "title": "If you already paid, contact your bank",
+          "description": "Contact your bank or payment provider immediately. If you paid via cryptocurrency, file a report but be aware recovery is unlikely.",
+          "help_detail": "Some payment methods may allow chargebacks or reversals if reported quickly.",
+          "action_type": "call",
+          "action_data": {"label": "Call Your Bank"}
+        }
+      ],
+      "quick_dial_contacts": [
+        {"name": "FTC", "phone": "877-382-4357", "description": "Federal Trade Commission"}
+      ]
+    },
+    "ransomware_extortion": {
+      "title": "Ransomware Threat",
+      "urgency": "high",
+      "opening_message": "Don't worry — let's figure out if this is real and what to do next.",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Do not pay the ransom",
+          "description": "Payment does not guarantee file recovery and funds criminal operations.",
+          "help_detail": "The FBI and cybersecurity experts advise against paying ransoms. Many victims who pay never receive working decryption keys.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 2,
+          "title": "Verify the claim",
+          "description": "Many ransomware emails are bluffs with no actual encryption. Check whether you can still access your files normally. If your files open fine, the email is a scam — delete it.",
+          "help_detail": "Try opening several different files (documents, photos) in different folders. If everything works normally, the email is a bluff.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 3,
+          "title": "If files are actually encrypted: disconnect immediately",
+          "description": "Disconnect the affected device from Wi-Fi and all networks to prevent spread to other devices.",
+          "help_detail": "Unplug ethernet cables, turn off Wi-Fi, and disconnect any external drives or shared network folders.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 4,
+          "title": "Do not attempt to decrypt files with unknown tools",
+          "description": "Some 'decryption tools' found online are themselves malware.",
+          "help_detail": "Only use tools from trusted sources like the No More Ransom project.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 5,
+          "title": "Check No More Ransom",
+          "description": "Visit nomoreransom.org — a free, legitimate resource with decryption tools for many known ransomware strains.",
+          "help_detail": "This project is run by law enforcement and cybersecurity companies. It has helped hundreds of thousands of victims decrypt their files for free.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 6,
+          "title": "Report the incident",
+          "description": "Report to the FBI's IC3 (ic3.gov) and your local law enforcement.",
+          "help_detail": "Reporting helps authorities track ransomware groups and may eventually lead to free decryption tools.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 7,
+          "title": "Restore from backup",
+          "description": "If you have backups, restore your files from the most recent clean backup.",
+          "help_detail": "If you don't have backups, consult a professional data recovery service. After recovery, establish a regular backup routine.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 8,
+          "title": "After recovery: full scan and update",
+          "description": "Run a full device scan, update all software, and establish a regular backup routine.",
+          "help_detail": "Consider automatic cloud backups to protect against future incidents.",
+          "action_type": "info"
+        }
+      ],
+      "quick_dial_contacts": []
+    },
+    "pig_butchering": {
+      "title": "Romance-Investment Scam",
+      "urgency": "critical",
+      "opening_message": "Don't worry — let's fix this together. The most important thing is to stop further losses.",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Stop all further payments immediately",
+          "description": "No matter what the other person says, do not send any additional money. Claims that 'one more payment will unlock your funds' are part of the scam.",
+          "help_detail": "Scammers are experts at creating urgency and emotional pressure. Any request for more money at this point is guaranteed to be fraudulent.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 2,
+          "title": "Accept that the relationship is likely part of the scam",
+          "description": "This is difficult but important. Pig butchering scams deliberately build emotional trust over weeks or months before introducing the investment component.",
+          "help_detail": "The person you've been communicating with is almost certainly not who they claim to be. These scams often use stolen photos and scripted conversations run by organized crime groups.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 3,
+          "title": "Document everything",
+          "description": "Save all messages, transaction records, screenshots of the investment platform, and any contact details for the other person.",
+          "help_detail": "Take screenshots before the scammer deletes messages or the platform disappears. This evidence is critical for law enforcement.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 4,
+          "title": "Contact your bank or financial institution",
+          "description": "Report the transactions. Some transfers may be reversible depending on timing and method.",
+          "help_detail": "Wire transfers may be recoverable if reported within 24-72 hours. Credit card charges can often be disputed. Cryptocurrency transfers are generally not recoverable.",
+          "action_type": "call",
+          "action_data": {"label": "Call Your Bank"}
+        },
+        {
+          "step_number": 5,
+          "title": "Report to the FTC and FBI",
+          "description": "File reports at reportfraud.ftc.gov, ic3.gov, and your state attorney general's office.",
+          "help_detail": "These agencies track fraud patterns and occasionally recover funds from scam operations.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 6,
+          "title": "Report the fraudulent investment platform",
+          "description": "Report to the SEC (sec.gov/tcr) or CFTC if cryptocurrency was involved.",
+          "help_detail": "The SEC investigates fraudulent investment platforms and can take action to shut them down.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 7,
+          "title": "Report the scammer's profile",
+          "description": "Report the profile on the dating app or social media platform where you met them.",
+          "help_detail": "This helps platforms remove scam profiles and protect other potential victims.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 8,
+          "title": "Beware of recovery scams",
+          "description": "After being scammed, victims are often targeted by people claiming they can recover lost funds for a fee. These are also scams.",
+          "help_detail": "Legitimate law enforcement and regulatory agencies do not charge fees to help fraud victims.",
+          "action_type": "info"
+        },
+        {
+          "step_number": 9,
+          "title": "Consider speaking with a counselor",
+          "description": "Pig butchering victims often experience significant emotional distress. AARP's fraud helpline (877-908-3360) provides free support.",
+          "help_detail": "There is no shame in being a victim of these scams. They are run by sophisticated criminal organizations that deliberately exploit human emotions.",
+          "action_type": "call",
+          "action_data": {"label": "Call AARP Helpline", "phone": "877-908-3360"}
+        }
+      ],
+      "quick_dial_contacts": [
+        {"name": "AARP Fraud Helpline", "phone": "877-908-3360", "description": "Free fraud support"},
+        {"name": "FTC", "phone": "877-382-4357", "description": "Federal Trade Commission"}
+      ]
+    }
+  },
+  "triage_questions": [
+    {
+      "id": "q1",
+      "question": "What happened?",
+      "options": [
+        {"id": "q1_link", "label": "I tapped or clicked a link in a message", "maps_to": null},
+        {"id": "q1_password", "label": "I entered my password on a website", "maps_to": "credential_theft"},
+        {"id": "q1_financial", "label": "I entered my credit card or bank information", "maps_to": "financial_fraud"},
+        {"id": "q1_download", "label": "I downloaded a file or app", "maps_to": "malware_download"},
+        {"id": "q1_personal", "label": "I gave personal information (SSN, date of birth, ID)", "maps_to": "identity_theft"},
+        {"id": "q1_money", "label": "I sent money, gift cards, or cryptocurrency", "maps_to": "gift_card_wire"},
+        {"id": "q1_remote", "label": "I gave someone remote access to my device", "maps_to": "remote_access"},
+        {"id": "q1_threat", "label": "I received a threatening email demanding payment", "maps_to": "blackmail_sextortion"},
+        {"id": "q1_ransom", "label": "I received an email claiming my files are encrypted", "maps_to": "ransomware_extortion"},
+        {"id": "q1_invest", "label": "Someone I met online is asking me to invest money", "maps_to": "pig_butchering"},
+        {"id": "q1_unknown", "label": "I'm not sure what happened", "maps_to": "general_unknown"}
+      ]
+    },
+    {
+      "id": "q2_link",
+      "question": "After tapping the link, what did you do?",
+      "condition": "q1_link",
+      "options": [
+        {"id": "q2_nothing", "label": "I just opened the page and closed it", "maps_to": "general_unknown"},
+        {"id": "q2_entered_pw", "label": "I entered a username or password", "maps_to": "credential_theft"},
+        {"id": "q2_entered_card", "label": "I entered payment or bank details", "maps_to": "financial_fraud"},
+        {"id": "q2_downloaded", "label": "I downloaded something", "maps_to": "malware_download"},
+        {"id": "q2_not_sure", "label": "I'm not sure", "maps_to": "general_unknown"}
+      ]
+    }
+  ]
+}
