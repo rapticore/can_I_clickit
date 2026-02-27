@@ -1,14 +1,20 @@
 import "./globals.css";
+import { AuthProvider } from "lib/auth-context";
+import { UXModeProvider } from "lib/ux-mode-context";
 
 export const metadata = {
-  title: "Can I Click It? Web Tester",
-  description: "Local test console for Can I Click It scan API",
+  title: "Can I Click It?",
+  description: "AI-Powered Personal Safety Assistant — A Seatbelt for the Internet",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="min-h-screen text-text-primary antialiased">
+        <AuthProvider>
+          <UXModeProvider>{children}</UXModeProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }

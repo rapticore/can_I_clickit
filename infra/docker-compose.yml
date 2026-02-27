@@ -12,6 +12,7 @@ services:
       CLICKIT_ELASTICSEARCH_URL: http://elasticsearch:9200
       CLICKIT_API_KEYS: '["${CLICKIT_API_KEYS:-dev-key-12345}"]'
       CLICKIT_CORS_ORIGINS: '["http://localhost:3007"]'
+      CLICKIT_JWT_SECRET_KEY: ${CLICKIT_JWT_SECRET_KEY:-docker-dev-jwt-secret-change-in-prod}
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,6 +53,7 @@ services:
       CLICKIT_ELASTICSEARCH_URL: http://elasticsearch:9200
       CLICKIT_API_KEYS: '["${CLICKIT_API_KEYS:-dev-key-12345}"]'
       CLICKIT_CORS_ORIGINS: '["http://localhost:3007"]'
+      CLICKIT_JWT_SECRET_KEY: test-jwt-secret-for-docker-tests
     depends_on:
       postgres:
         condition: service_healthy

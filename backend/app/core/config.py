@@ -31,6 +31,10 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = []
 
+    jwt_secret_key: str = ""
+    jwt_algorithm: str = "HS256"
+    jwt_expiry_minutes: int = 1440
+
     aws_region: str = "us-east-1"
     s3_bucket: str = "clickit-data"
 
@@ -55,6 +59,19 @@ class Settings(BaseSettings):
     def validate_redis_url(cls, value: str) -> str:
         if not value:
             raise ValueError("CLICKIT_REDIS_URL is required. Provide a Redis connection string.")
+        return value
+
+    @field_validator("jwt_secret_key")
+    @classmethod
+    def validate_jwt_secret_key(cls, value: str, info) -> str:
+        debug = info.data.get("debug", False)
+        if not value:
+            if debug:
+                return "dev-jwt-secret-not-for-production"
+            raise ValueError(
+                "CLICKIT_JWT_SECRET_KEY is required when debug is disabled. "
+                "Set a strong random secret."
+            )
         return value
 
     @field_validator("cors_origins")

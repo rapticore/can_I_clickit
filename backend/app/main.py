@@ -7,7 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.v1.routes import feedback, health, recovery, scan
+from app.api.v1.routes import auth, feedback, health, recovery, scan
 from app.cache.redis_client import close_redis
 from app.core.config import get_settings
 from app.db.database import close_db, init_db_schema
@@ -52,11 +52,12 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
-        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
         allow_headers=["Content-Type", "X-API-Key", "Authorization"],
     )
 
     application.include_router(health.router, prefix="/v1", tags=["Health"])
+    application.include_router(auth.router, prefix="/v1", tags=["Auth"])
     application.include_router(scan.router, prefix="/v1", tags=["Scan"])
     application.include_router(recovery.router, prefix="/v1", tags=["Recovery"])
     application.include_router(feedback.router, prefix="/v1", tags=["Feedback"])

@@ -5,6 +5,7 @@ from unittest.mock import AsyncMock, patch
 os.environ.setdefault("CLICKIT_DATABASE_URL", "postgresql+asyncpg://clickit:clickit@localhost:5432/clickit")
 os.environ.setdefault("CLICKIT_REDIS_URL", "redis://localhost:6379/0")
 os.environ.setdefault("CLICKIT_DEBUG", "true")
+os.environ.setdefault("CLICKIT_JWT_SECRET_KEY", "test-jwt-secret-key-for-unit-tests")
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -154,4 +155,33 @@ async def client(mock_redis, test_db):
                 async with AsyncClient(transport=transport, base_url="http://test") as ac:
                     yield ac
                     
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture
+async def authenticated_client(mock_redis, test_db):
+    """Async test client with a pre-registered user session cookie."""
+
+    async def _override_get_db():
+        yield test_db
+
+    async def _override_rate_limit():
+        return None
+
+    app.dependency_overrides[get_db] = _override_get_db
+    app.dependency_overrides[check_rate_limit] = _override_rate_limit
+
+    with patch("app.cache.redis_client.get_redis", return_value=mock_redis):
+        with patch("app.main.init_db_schema", return_value=None):
+            with patch("app.cache.redis_client.close_redis", return_value=None):
+                transport = ASGITransport(app=app)
+                async with AsyncClient(transport=transport, base_url="http://test") as ac:
+                    # Register a test user and capture the session cookie
+                    reg_response = await ac.post(
+                        "/v1/auth/register",
+                        json={"email": "test@example.com", "password": "testpassword123"},
+                    )
+                    assert reg_response.status_code == 201
+                    yield ac
+
     app.dependency_overrides.clear()
