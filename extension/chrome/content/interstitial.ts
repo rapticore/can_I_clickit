@@ -170,43 +170,51 @@ function getInterstitialCSS(): string {
   `;
 }
 
-function buildInterstitialHTML(data: InterstitialData): string {
-  const threatLabel = data.verdict === "critical" ? "Critical Threat" : "Dangerous";
-
-  return `
-    <div class="cici-interstitial">
-      <div class="cici-interstitial__card">
-        <div class="cici-interstitial__icon">⚠️</div>
-        <div class="cici-interstitial__title">This link may be dangerous</div>
-        <div class="cici-interstitial__threat">${threatLabel}</div>
-        <div class="cici-interstitial__summary">${escapeHtml(data.threat_summary)}</div>
-        <div class="cici-interstitial__consequence">
-          <strong>What could happen:</strong>
-          ${escapeHtml(data.consequence_warning)}
-        </div>
-        <div class="cici-interstitial__safe-action">
-          <strong>What to do instead:</strong>
-          ${escapeHtml(data.safe_action_suggestion)}
-        </div>
-        <div class="cici-interstitial__actions">
-          <button class="cici-interstitial__btn-primary" data-action="go-back">Go Back to Safety</button>
-          <button class="cici-interstitial__btn-secondary" data-action="proceed">Proceed Anyway</button>
-        </div>
-        <a class="cici-interstitial__recovery-link" data-action="recovery">What do I do now?</a>
-        <div class="cici-interstitial__disclaimer">
-          This analysis is our best assessment based on available signals. Always verify
-          directly with the sender if you are unsure. This guidance is informational and
-          not a substitute for professional security or legal advice.
-        </div>
+// Static HTML skeleton — contains NO dynamic data.
+// All user-controlled values are set via textContent after cloning.
+const INTERSTITIAL_TEMPLATE_HTML = `
+  <div class="cici-interstitial">
+    <div class="cici-interstitial__card">
+      <div class="cici-interstitial__icon">\u26A0\uFE0F</div>
+      <div class="cici-interstitial__title">This link may be dangerous</div>
+      <div class="cici-interstitial__threat"></div>
+      <div class="cici-interstitial__summary"></div>
+      <div class="cici-interstitial__consequence">
+        <strong>What could happen:</strong>
+        <span data-slot="consequence"></span>
+      </div>
+      <div class="cici-interstitial__safe-action">
+        <strong>What to do instead:</strong>
+        <span data-slot="safe-action"></span>
+      </div>
+      <div class="cici-interstitial__actions">
+        <button class="cici-interstitial__btn-primary" data-action="go-back">Go Back to Safety</button>
+        <button class="cici-interstitial__btn-secondary" data-action="proceed">Proceed Anyway</button>
+      </div>
+      <a class="cici-interstitial__recovery-link" data-action="recovery">What do I do now?</a>
+      <div class="cici-interstitial__disclaimer">
+        This analysis is our best assessment based on available signals. Always verify
+        directly with the sender if you are unsure. This guidance is informational and
+        not a substitute for professional security or legal advice.
       </div>
     </div>
-  `;
-}
+  </div>
+`;
 
-function escapeHtml(str: string): string {
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
+function buildInterstitialDOM(data: InterstitialData): DocumentFragment {
+  const threatLabel = data.verdict === "critical" ? "Critical Threat" : "Dangerous";
+
+  const template = document.createElement("template");
+  template.innerHTML = INTERSTITIAL_TEMPLATE_HTML;
+  const content = template.content;
+
+  // Populate dynamic values via textContent (XSS-safe)
+  content.querySelector(".cici-interstitial__threat")!.textContent = threatLabel;
+  content.querySelector(".cici-interstitial__summary")!.textContent = data.threat_summary;
+  content.querySelector("[data-slot='consequence']")!.textContent = data.consequence_warning;
+  content.querySelector("[data-slot='safe-action']")!.textContent = data.safe_action_suggestion;
+
+  return content;
 }
 
 export function showInterstitial(
@@ -225,7 +233,7 @@ export function showInterstitial(
   shadow.appendChild(style);
 
   const container = document.createElement("div");
-  container.innerHTML = buildInterstitialHTML(data);
+  container.appendChild(buildInterstitialDOM(data));
   shadow.appendChild(container);
 
   container.addEventListener("click", (e) => {

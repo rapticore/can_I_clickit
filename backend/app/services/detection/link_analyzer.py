@@ -1,3 +1,4 @@
+import ipaddress
 import ssl
 import socket
 from urllib.parse import urlparse
@@ -11,6 +12,46 @@ logger = structlog.get_logger()
 
 MAX_REDIRECTS = 10
 
+# SSRF protection: block outbound requests to private/reserved IP ranges
+_BLOCKED_NETWORKS = [
+    ipaddress.ip_network("0.0.0.0/8"),
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("100.64.0.0/10"),
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("169.254.0.0/16"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.0.0.0/24"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("224.0.0.0/4"),
+    ipaddress.ip_network("240.0.0.0/4"),
+    # IPv6
+    ipaddress.ip_network("::1/128"),
+    ipaddress.ip_network("fc00::/7"),
+    ipaddress.ip_network("fe80::/10"),
+]
+
+
+def _is_blocked_host(hostname: str) -> bool:
+    """Return True if hostname resolves to a private/reserved IP (SSRF protection)."""
+    if not hostname:
+        return True
+    # Check if hostname is a literal IP address
+    try:
+        addr = ipaddress.ip_address(hostname)
+        return any(addr in net for net in _BLOCKED_NETWORKS)
+    except ValueError:
+        pass
+    # Resolve domain name and check all results
+    try:
+        results = socket.getaddrinfo(hostname, None, proto=socket.IPPROTO_TCP)
+        for _, _, _, _, sockaddr in results:
+            addr = ipaddress.ip_address(sockaddr[0])
+            if any(addr in net for net in _BLOCKED_NETWORKS):
+                return True
+        return False
+    except socket.gaierror:
+        return True  # unresolvable hostname — block to be safe
+
 
 class LinkAnalyzer:
     """Full link analysis: domain reputation, redirects, typosquatting, SSL, WHOIS."""
@@ -23,6 +64,15 @@ class LinkAnalyzer:
             domain = parsed.hostname or ""
         except Exception:
             return [SignalResult(source=SignalSource.HEURISTIC, score=60, detail="Malformed URL")]
+
+        if parsed.scheme not in ("http", "https"):
+            return [SignalResult(source=SignalSource.HEURISTIC, score=60, detail="Unsupported URL scheme")]
+
+        if _is_blocked_host(domain):
+            return [SignalResult(
+                source=SignalSource.HEURISTIC, score=90,
+                detail="URL target is a private or reserved address",
+            )]
 
         redirect_signals = await self._check_redirects(url)
         signals.extend(redirect_signals)
@@ -47,9 +97,20 @@ class LinkAnalyzer:
                 seen_domains = set()
 
                 while redirect_count < MAX_REDIRECTS:
-                    resp = await client.head(current_url)
                     parsed = urlparse(current_url)
-                    seen_domains.add(parsed.hostname)
+                    hostname = parsed.hostname or ""
+
+                    # Validate every hop in the redirect chain
+                    if _is_blocked_host(hostname):
+                        signals.append(SignalResult(
+                            source=SignalSource.HEURISTIC,
+                            score=90,
+                            detail="Redirect chain targets a private or reserved address",
+                        ))
+                        break
+
+                    resp = await client.head(current_url)
+                    seen_domains.add(hostname)
 
                     if resp.status_code not in (301, 302, 303, 307, 308):
                         break
@@ -86,6 +147,8 @@ class LinkAnalyzer:
 
     async def _check_ssl(self, domain: str) -> list[SignalResult]:
         signals = []
+        if _is_blocked_host(domain):
+            return signals
         try:
             ctx = ssl.create_default_context()
             with socket.create_connection((domain, 443), timeout=3) as sock:
