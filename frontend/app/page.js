@@ -95,7 +95,7 @@ export default function HomePage() {
                 type="text"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="dev-key-12345"
+                placeholder="your-api-key"
               />
             </label>
 
