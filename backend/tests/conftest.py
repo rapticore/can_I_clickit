@@ -1,6 +1,11 @@
 import os
 from unittest.mock import AsyncMock, patch
 
+# Set required env vars before importing app (validators reject empty defaults)
+os.environ.setdefault("CLICKIT_DATABASE_URL", "postgresql+asyncpg://clickit:clickit@localhost:5432/clickit")
+os.environ.setdefault("CLICKIT_REDIS_URL", "redis://localhost:6379/0")
+os.environ.setdefault("CLICKIT_DEBUG", "true")
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text

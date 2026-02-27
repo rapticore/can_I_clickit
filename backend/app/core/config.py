@@ -9,8 +9,8 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
     debug: bool = False
 
-    database_url: str = "postgresql+asyncpg://clickit:clickit@localhost:5432/clickit"
-    redis_url: str = "redis://localhost:6379/0"
+    database_url: str = ""
+    redis_url: str = ""
     elasticsearch_url: str = "http://localhost:9200"
 
     api_key_header: str = "X-API-Key"
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     enable_live_link_checks: bool = False
     max_live_url_lookups: int = 2
 
-    cors_origins: list[str] = ["*"]
+    cors_origins: list[str] = []
 
     aws_region: str = "us-east-1"
     s3_bucket: str = "clickit-data"
@@ -41,11 +41,31 @@ class Settings(BaseSettings):
     @field_validator("database_url")
     @classmethod
     def validate_database_url(cls, value: str) -> str:
+        if not value:
+            raise ValueError("CLICKIT_DATABASE_URL is required. Provide a PostgreSQL connection string.")
         normalized = value.lower()
         if normalized.startswith("sqlite"):
             raise ValueError("SQLite is not supported. Configure CLICKIT_DATABASE_URL to PostgreSQL.")
         if not normalized.startswith("postgresql+asyncpg://"):
             raise ValueError("Only postgresql+asyncpg URLs are supported for CLICKIT_DATABASE_URL.")
+        return value
+
+    @field_validator("redis_url")
+    @classmethod
+    def validate_redis_url(cls, value: str) -> str:
+        if not value:
+            raise ValueError("CLICKIT_REDIS_URL is required. Provide a Redis connection string.")
+        return value
+
+    @field_validator("cors_origins")
+    @classmethod
+    def validate_cors_origins(cls, value: list[str], info) -> list[str]:
+        debug = info.data.get("debug", False)
+        if not debug and "*" in value:
+            raise ValueError(
+                "Wildcard '*' in CLICKIT_CORS_ORIGINS is not allowed when debug is disabled. "
+                "Specify explicit origins."
+            )
         return value
 
 
