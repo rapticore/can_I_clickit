@@ -26,7 +26,7 @@ This is a fully functional application you can run locally with Docker. The work
 - **Tiered AI analysis pipeline** -- Three-stage detection (heuristics, ML classifiers, LLM reasoning) that routes 60-70% of scans through the fast path without an LLM call
 - **FastAPI backend** with 7 REST endpoints for scanning, recovery, feedback, and health
 - **10 complete recovery checklists** covering credential theft, financial fraud, identity theft, malware, gift card scams, remote access compromise, sextortion/blackmail, ransomware, pig butchering/romance scams, and general unknown threats
-- **Next.js web tester UI** for submitting messages/URLs and inspecting the full verdict payload
+- **Next.js web app** with email/password registration, JWT auth, two UX modes (Simple/Expert), multi-page Tailwind CSS interface with dashboard, scan history, recovery wizard, and settings
 - **Chrome extension** (Manifest V3) with link hover analysis, page trust scores, and warning interstitials
 - **iOS app** (Swift/SwiftUI) with share sheet, QR scanner, voice input, Grandma Mode, and recovery flows
 - **Android app** (Kotlin/Compose) with Material Design 3, ML Kit barcode scanning, and speech services
@@ -39,8 +39,8 @@ This is a fully functional application you can run locally with Docker. The work
 
 ```
 can_I_clickit/
-  backend/          Python/FastAPI -- Tiered AI analysis pipeline, verdict engine, recovery engine
-  frontend/         Next.js/React -- Web tester UI for posting messages to the scan API
+  backend/          Python/FastAPI -- Tiered AI analysis pipeline, JWT auth, verdict engine, recovery engine
+  frontend/         Next.js 15/React 19 -- Multi-page Tailwind CSS app with auth, two UX modes, dashboard
   mobile/ios/       Swift/SwiftUI -- iOS app with share sheet, QR scanner, voice, Grandma Mode
   mobile/android/   Kotlin/Compose -- Android app with Material Design 3
   extension/chrome/ TypeScript -- Chrome Manifest V3 extension with hover analysis
@@ -71,6 +71,7 @@ The **safety bias** ensures that when the system is uncertain, it defaults to "s
 
 - **Docker** and **Docker Compose** (v2+)
 - **Git**
+- **Node.js >= 20** (for local frontend development without Docker)
 - Ports 8880, 3007, 5432, 6379, 9200, 9000, 9001 available
 
 ### 1. Clone and Start (Docker -- Recommended)
@@ -87,15 +88,13 @@ Wait for all services to report healthy (typically 30-60 seconds), then open:
 
 | Service | URL | Description |
 |---------|-----|-------------|
-| Web Tester | http://localhost:3007 | Submit messages/URLs for analysis |
+| Web App | http://localhost:3007 | Register, log in, and analyze messages/URLs |
 | API | http://localhost:8880 | FastAPI backend (Swagger docs at `/docs`) |
 | MinIO Console | http://localhost:9001 | S3-compatible object storage UI |
 
-The web tester is preconfigured with API key `dev-key-12345`. Type or paste a suspicious message, select "Text" or "URL", and hit **Analyze**.
+Open http://localhost:3007, register an account, and you'll land on the dashboard where you can analyze suspicious messages and URLs. Toggle between **Simple Mode** (large text, emoji verdicts, step-by-step guidance) and **Expert Mode** (signal tables, confidence scores, raw JSON) in Settings.
 
-### 2. Try a Scan
-
-In the web tester at http://localhost:3007, use the **"Load phishing sample"** button or paste your own message. You can also call the API directly:
+You can also use the API directly with your per-user API key or a global key from `CLICKIT_API_KEYS`:
 
 ```bash
 curl -s -X POST http://localhost:8880/v1/scan \
@@ -144,6 +143,8 @@ If you prefer running the backend natively (PostgreSQL and Redis must be availab
 ```bash
 # Copy and edit environment config
 cp .env.example .env
+# At minimum, set CLICKIT_DATABASE_URL, CLICKIT_REDIS_URL.
+# Set CLICKIT_DEBUG=true for local development (auto-generates a dev JWT secret).
 
 # Set up Python
 cd backend
@@ -153,29 +154,50 @@ pip install -r requirements.txt
 # Start the API (port matches docker-compose)
 uvicorn app.main:app --reload --port 8880
 
-# In another terminal, start the frontend
+# In another terminal, start the frontend (requires Node >= 20)
 cd frontend
 npm install
 npm run dev
 ```
 
-**Note:** SQLite is not supported. The application requires PostgreSQL (`postgresql+asyncpg`) for both local and production environments.
+**Note:** SQLite is not supported. The application requires PostgreSQL (`postgresql+asyncpg`) for both local and production environments. The frontend uses Tailwind CSS v4 which requires **Node.js >= 20**. If you switch Node versions, delete `node_modules` and run `npm install` again.
 
 ---
 
 ## API Endpoints
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/v1/scan` | Analyze text, URL, or QR data |
-| POST | `/v1/scan/screenshot` | Analyze screenshot via OCR (multipart upload) |
-| POST | `/v1/scan/screenshot/base64` | Analyze base64 screenshot payload (mobile) |
-| GET | `/v1/page-trust` | Domain trust score for browser extension |
-| POST | `/v1/recovery/triage` | Submit triage answers, get recovery checklist |
-| GET | `/v1/recovery/checklist/{category}` | Get recovery steps for a threat category |
-| GET | `/v1/recovery/triage/questions` | Get triage questionnaire |
-| POST | `/v1/feedback` | Submit verdict feedback (correct / false positive / false negative) |
-| GET | `/v1/health` | Service health check |
+### Authentication
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/v1/auth/register` | None | Create account, returns JWT cookie + API key |
+| POST | `/v1/auth/login` | None | Log in, returns JWT cookie |
+| POST | `/v1/auth/logout` | JWT | Clear session cookie |
+| GET | `/v1/auth/me` | JWT or API key | Current user profile |
+| PATCH | `/v1/auth/profile` | JWT or API key | Update grandma_mode / language |
+| POST | `/v1/auth/rotate-api-key` | JWT | Regenerate per-user API key |
+
+### Scan & Analysis
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/v1/scan` | JWT or API key | Analyze text, URL, or QR data |
+| POST | `/v1/scan/screenshot` | JWT or API key | Analyze screenshot via OCR (multipart upload) |
+| POST | `/v1/scan/screenshot/base64` | JWT or API key | Analyze base64 screenshot payload (mobile) |
+| GET | `/v1/scan/history` | JWT or API key | Paginated scan history for the current user |
+| GET | `/v1/page-trust` | JWT or API key | Domain trust score for browser extension |
+
+### Recovery & Feedback
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/v1/recovery/triage` | JWT or API key | Submit triage answers, get recovery checklist |
+| GET | `/v1/recovery/checklist/{category}` | JWT or API key | Get recovery steps for a threat category |
+| GET | `/v1/recovery/triage/questions` | JWT or API key | Get triage questionnaire |
+| POST | `/v1/feedback` | JWT or API key | Submit verdict feedback |
+| GET | `/v1/health` | None | Service health check |
+
+All endpoints accept authentication via either a `clickit_session` JWT cookie or an `X-API-Key` header. In debug mode, unauthenticated access is allowed.
 
 Full interactive API documentation is available at http://localhost:8880/docs when the API is running.
 
@@ -206,9 +228,10 @@ Each checklist includes a calming opening ("Don't worry -- let's fix this togeth
 
 | Layer | Technology |
 |-------|-----------|
-| Backend API | Python 3.12, FastAPI, Pydantic v2, SQLAlchemy (async), Alembic |
+| Backend API | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy (async), Alembic |
+| Authentication | JWT (python-jose), bcrypt (passlib), httponly cookies, per-user API keys |
 | AI / ML | Anthropic Claude (Haiku / Sonnet), custom heuristic + ML classifiers, Tesseract OCR |
-| Web Tester | Next.js 14, React 18 |
+| Web App | Next.js 15, React 19, Tailwind CSS v4 |
 | iOS App | Swift, SwiftUI, AVFoundation, SFSpeechRecognizer |
 | Android App | Kotlin, Jetpack Compose, Material Design 3, ML Kit, CameraX |
 | Browser Extension | TypeScript, Chrome Manifest V3 |
@@ -226,14 +249,17 @@ All backend configuration is via environment variables prefixed with `CLICKIT_`.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CLICKIT_DATABASE_URL` | `postgresql+asyncpg://clickit:clickit@localhost:5432/clickit` | PostgreSQL connection string |
-| `CLICKIT_REDIS_URL` | `redis://localhost:6379/0` | Redis connection string |
-| `CLICKIT_API_KEYS` | `[]` | JSON array of valid API keys (empty = dev mode, no auth) |
+| `CLICKIT_DATABASE_URL` | *(required)* | PostgreSQL connection string (`postgresql+asyncpg://...`) |
+| `CLICKIT_REDIS_URL` | *(required)* | Redis connection string |
+| `CLICKIT_JWT_SECRET_KEY` | *(required in prod)* | Secret for signing JWT tokens. Auto-set in debug mode |
+| `CLICKIT_JWT_ALGORITHM` | `HS256` | JWT signing algorithm |
+| `CLICKIT_JWT_EXPIRY_MINUTES` | `1440` | JWT token lifetime (default 24h) |
+| `CLICKIT_API_KEYS` | `[]` | JSON array of global API keys (legacy/shared access) |
 | `CLICKIT_ANTHROPIC_API_KEY` | `""` | Anthropic API key for LLM reasoning tier |
 | `CLICKIT_VIRUSTOTAL_API_KEY` | `""` | VirusTotal API key for domain reputation |
 | `CLICKIT_FREE_TIER_DAILY_SCANS` | `5` | Daily scan limit for free-tier users |
 | `CLICKIT_ENABLE_LIVE_LINK_CHECKS` | `false` | Enable live URL fetching (redirects, SSL) |
-| `CLICKIT_CORS_ORIGINS` | `["*"]` | Allowed CORS origins |
+| `CLICKIT_CORS_ORIGINS` | `[]` | Allowed CORS origins (wildcard rejected in production) |
 | `CLICKIT_LOG_LEVEL` | `INFO` | Logging level |
 
 ---
@@ -255,7 +281,7 @@ This section outlines the path from the current working prototype to a productio
 
 **Security**
 
-- Replace static API keys with JWT-based authentication (user registration + login)
+- ~~Replace static API keys with JWT-based authentication (user registration + login)~~ *Done (Sprint 1)*
 - Add OAuth2 flows for mobile apps
 - Implement per-user rate limiting with token bucket algorithm
 - Complete OWASP Top 10 audit on all endpoints
@@ -367,23 +393,39 @@ This is the highest-leverage improvement. The current system uses static heurist
 ```
 backend/
   app/
-    api/v1/routes/         API endpoint handlers (scan, recovery, feedback, health)
-    core/                  Config, auth, rate limiting
+    api/v1/routes/         API endpoint handlers (auth, scan, recovery, feedback, health)
+    core/                  Config, JWT/API-key auth, rate limiting
     services/
+      auth.py              Password hashing, JWT tokens, API key generation
       analysis/            Tiered pipeline: fast_path, ml_path, llm_path
       detection/           Intent detector, link analyzer, content analyzer, OCR, QR
       verdict/             Verdict engine, confidence calibration, consequence + safe action
       recovery/            Recovery engine, triage logic, content library
-    models/                Pydantic request/response schemas
+    models/                Pydantic request/response schemas (auth, scan, recovery, feedback)
     integrations/          VirusTotal, PhishTank, URLhaus, Anthropic, WHOIS clients
     db/                    SQLAlchemy models, Alembic migrations
     cache/                 Redis client with hash-based verdict caching
   tests/
-    unit/                  Unit tests for all services
+    unit/                  Unit tests for all services (incl. auth)
     integration/           End-to-end pipeline tests
     load/                  Locust load test config
 
-frontend/                  Next.js web tester UI
+frontend/                  Next.js 15 / React 19 / Tailwind CSS v4
+  app/
+    (auth)/                Login and registration pages (no navbar)
+    (app)/                 Authenticated pages with navbar + footer
+      dashboard/           Main scan interface (Simple & Expert modes)
+      history/             Scan history with pagination
+      recovery/            Triage wizard + recovery checklists
+      settings/            Profile, display mode toggle, API key management
+  components/
+    ui/                    Button, Card, Input, Badge, Spinner, Modal
+    layout/                Navbar (responsive), Footer
+    scan/                  ScanForm, ScanResult, GrandmaResult, AnalystResult
+    history/               HistoryCards (simple), HistoryTable (expert)
+    recovery/              TriageWizard, RecoveryChecklist
+    settings/              ProfileForm, GrandmaModeToggle, ApiKeyPanel
+  lib/                     API client, AuthProvider, UXModeProvider
 
 mobile/
   ios/CanIClickIt/         SwiftUI app (14 source files)

@@ -4,7 +4,7 @@ from typing import Any
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from app.core.security import verify_api_key
+from app.core.security import get_current_user
 from app.models.recovery import (
     RecoveryChecklist,
     ThreatCategory,
@@ -57,7 +57,7 @@ def _extract_triage_answers(payload: Any) -> list[TriageAnswer]:
 @router.post("/recovery/triage", response_model=RecoveryChecklist)
 async def triage_recovery(
     raw_request: Request,
-    _api_key: str = Depends(verify_api_key),
+    _current_user=Depends(get_current_user),
 ):
     session_id = str(uuid.uuid4())
     logger.info("recovery_triage_started", session_id=session_id)
@@ -88,7 +88,7 @@ async def triage_recovery(
 @router.get("/recovery/checklist/{category}", response_model=RecoveryChecklist)
 async def get_recovery_checklist(
     category: str,
-    _api_key: str = Depends(verify_api_key),
+    _current_user=Depends(get_current_user),
 ):
     try:
         threat_cat = ThreatCategory(category)
@@ -104,7 +104,7 @@ async def get_recovery_checklist(
 
 @router.get("/recovery/triage/questions")
 async def get_triage_questions(
-    _api_key: str = Depends(verify_api_key),
+    _current_user=Depends(get_current_user),
 ):
     engine = RecoveryEngine()
     return {"questions": engine.get_triage_questions()}
