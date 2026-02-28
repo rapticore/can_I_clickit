@@ -1,0 +1,16 @@
+# Copy this file to terraform.tfvars and fill in the values.
+# Do NOT commit terraform.tfvars to version control.
+
+project     = "clickit"
+environment = "prod"
+aws_region  = "us-east-1"
+
+# Required for production
+api_keys_json = "[\"your-production-api-key\"]"
+
+# Optional: external API keys
+# anthropic_api_key  = "sk-ant-..."
+# virustotal_api_key = "..."
+
+# HTTPS: provide a domain name to enable ACM certificate + HTTPS listener
+# domain_name = "clickit.example.com"
