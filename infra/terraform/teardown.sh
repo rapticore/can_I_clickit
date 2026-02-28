@@ -77,11 +77,23 @@ preflight() {
         exit 1
     fi
 
-    local account_id
+    local account_id account_arn
     account_id=$(aws sts get-caller-identity --query 'Account' --output text)
-    log "AWS Account: $account_id"
+    account_arn=$(aws sts get-caller-identity --query 'Arn' --output text)
+
+    echo ""
+    log "AWS Account: ${YELLOW}${account_id}${NC}"
+    log "AWS Role:    $account_arn"
+    log "AWS Profile: ${AWS_PROFILE:-<default>}"
     log "AWS Region:  $REGION"
     log "Project:     $PROJECT"
+    echo ""
+
+    read -rp "Is this the correct AWS account? (y/N): " acct_confirm
+    if [[ "$acct_confirm" != "y" && "$acct_confirm" != "Y" ]]; then
+        err "Wrong account. Set the correct profile: export AWS_PROFILE=<profile>"
+        exit 1
+    fi
 }
 
 # -------------------------------------------------------------------
@@ -213,7 +225,16 @@ destroy_state_infra() {
     log "Destroying Terraform state infrastructure..."
 
     # Empty and delete S3 state bucket
-    if aws s3api head-bucket --bucket "$STATE_BUCKET" 2>/dev/null; then
+    # head-bucket returns non-zero for both 403 (wrong account) and 404 (not found).
+    # Capture stderr to distinguish the two cases.
+    local hb_err
+    hb_err=$(aws s3api head-bucket --bucket "$STATE_BUCKET" 2>&1) && hb_err=""
+    if [[ -n "$hb_err" && "$hb_err" == *"403"* ]]; then
+        err "Access denied for bucket $STATE_BUCKET. Are you using the correct AWS_PROFILE?"
+        err "Current profile: ${AWS_PROFILE:-<default>}"
+        return 1
+    fi
+    if [[ -z "$hb_err" ]]; then
         log "  Emptying state bucket: $STATE_BUCKET"
         aws s3 rm "s3://$STATE_BUCKET" --recursive --region "$REGION" 2>/dev/null || true
 
@@ -249,7 +270,13 @@ destroy_state_infra() {
     fi
 
     # Delete DynamoDB lock table
-    if aws dynamodb describe-table --table-name "$LOCK_TABLE" --region "$REGION" &>/dev/null; then
+    local ddb_err
+    ddb_err=$(aws dynamodb describe-table --table-name "$LOCK_TABLE" --region "$REGION" 2>&1) && ddb_err=""
+    if [[ -n "$ddb_err" && "$ddb_err" == *"AccessDeniedException"* ]]; then
+        err "Access denied for DynamoDB table $LOCK_TABLE. Are you using the correct AWS_PROFILE?"
+        return 1
+    fi
+    if [[ -z "$ddb_err" ]]; then
         log "  Deleting lock table: $LOCK_TABLE"
         aws dynamodb delete-table --table-name "$LOCK_TABLE" --region "$REGION" --no-cli-pager >/dev/null 2>&1 || true
         ok "Lock table deleted."
