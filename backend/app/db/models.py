@@ -28,6 +28,7 @@ class User(Base):
     tier = Column(String(20), nullable=False, default="free")
     grandma_mode = Column(Boolean, default=False)
     language = Column(String(10), default="en")
+    api_key = Column(String(64), unique=True, nullable=True, index=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 

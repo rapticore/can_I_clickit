@@ -1,0 +1,12 @@
+# Copy this file to terraform.tfvars and fill in the values.
+# Do NOT commit terraform.tfvars to version control.
+
+project     = "clickit"
+environment = "dev"
+aws_region  = "us-east-1"
+
+# Optional: leave as defaults if not needed
+# api_keys_json      = "[\"key1\", \"key2\"]"
+# anthropic_api_key  = "sk-ant-..."
+# virustotal_api_key = "..."
+# domain_name        = "dev.example.com"

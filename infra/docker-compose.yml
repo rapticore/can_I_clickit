@@ -7,11 +7,12 @@ services:
       - "8880:8000"
     environment:
       CLICKIT_DEBUG: "true"
-      CLICKIT_DATABASE_URL: postgresql+asyncpg://clickit:clickit@postgres:5432/clickit
+      CLICKIT_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-clickit}:${POSTGRES_PASSWORD:-clickit}@postgres:5432/${POSTGRES_DB:-clickit}
       CLICKIT_REDIS_URL: redis://redis:6379/0
       CLICKIT_ELASTICSEARCH_URL: http://elasticsearch:9200
-      CLICKIT_API_KEYS: '["dev-key-12345"]'
+      CLICKIT_API_KEYS: '["${CLICKIT_API_KEYS:-dev-key-12345}"]'
       CLICKIT_CORS_ORIGINS: '["http://localhost:3007"]'
+      CLICKIT_JWT_SECRET_KEY: ${CLICKIT_JWT_SECRET_KEY:-docker-dev-jwt-secret-change-in-prod}
     depends_on:
       postgres:
         condition: service_healthy
@@ -31,7 +32,7 @@ services:
       - "3007:3000"
     environment:
       NEXT_PUBLIC_API_BASE_URL: http://localhost:8880
-      NEXT_PUBLIC_API_KEY: dev-key-12345
+      NEXT_PUBLIC_API_KEY: ${NEXT_PUBLIC_API_KEY:-dev-key-12345}
     depends_on:
       api:
         condition: service_started
@@ -46,12 +47,13 @@ services:
       dockerfile: Dockerfile
     environment:
       CLICKIT_DEBUG: "true"
-      CLICKIT_DATABASE_URL: postgresql+asyncpg://clickit:clickit@postgres:5432/clickit
-      CLICKIT_TEST_DATABASE_URL: postgresql+asyncpg://clickit:clickit@postgres:5432/clickit
+      CLICKIT_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-clickit}:${POSTGRES_PASSWORD:-clickit}@postgres:5432/${POSTGRES_DB:-clickit}
+      CLICKIT_TEST_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-clickit}:${POSTGRES_PASSWORD:-clickit}@postgres:5432/${POSTGRES_DB:-clickit}
       CLICKIT_REDIS_URL: redis://redis:6379/0
       CLICKIT_ELASTICSEARCH_URL: http://elasticsearch:9200
-      CLICKIT_API_KEYS: '["dev-key-12345"]'
+      CLICKIT_API_KEYS: '["${CLICKIT_API_KEYS:-dev-key-12345}"]'
       CLICKIT_CORS_ORIGINS: '["http://localhost:3007"]'
+      CLICKIT_JWT_SECRET_KEY: test-jwt-secret-for-docker-tests
     depends_on:
       postgres:
         condition: service_healthy
@@ -65,15 +67,15 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: clickit
-      POSTGRES_PASSWORD: clickit
-      POSTGRES_DB: clickit
+      POSTGRES_USER: ${POSTGRES_USER:-clickit}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-clickit}
+      POSTGRES_DB: ${POSTGRES_DB:-clickit}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U clickit -d clickit"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-clickit} -d ${POSTGRES_DB:-clickit}"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -106,8 +108,8 @@ services:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
     ports:
       - "9000:9000"
       - "9001:9001"

@@ -24,40 +24,65 @@ const CONFIDENCE_LABELS: Record<string, string> = {
   low: "Low confidence",
 };
 
-function buildTooltipHTML(data: TooltipData): string {
+// Static HTML skeletons — contain NO dynamic data.
+// All user-controlled values are set via textContent after cloning.
+const LOADING_TEMPLATE_HTML = `
+  <div class="cici-tooltip" style="border-left-color: #D0D5DD;">
+    <div class="cici-tooltip__header">
+      <span class="cici-tooltip__spinner"></span>
+      <span class="cici-tooltip__title">Analyzing\u2026</span>
+    </div>
+    <div class="cici-tooltip__url"></div>
+  </div>
+`;
+
+const TOOLTIP_TEMPLATE_HTML = `
+  <div class="cici-tooltip">
+    <div class="cici-tooltip__header">
+      <span class="cici-tooltip__dot"></span>
+      <span class="cici-tooltip__title"></span>
+      <span class="cici-tooltip__confidence"></span>
+    </div>
+    <div class="cici-tooltip__summary"></div>
+    <div class="cici-tooltip__meta">
+      <span class="cici-tooltip__domain-age"></span>
+    </div>
+    <div class="cici-tooltip__url"></div>
+  </div>
+`;
+
+function buildTooltipDOM(data: TooltipData): DocumentFragment {
+  const template = document.createElement("template");
+
+  if (data.loading) {
+    template.innerHTML = LOADING_TEMPLATE_HTML;
+    const content = template.content;
+    content.querySelector(".cici-tooltip__url")!.textContent = truncateUrl(data.url);
+    return content;
+  }
+
   const color = VERDICT_COLORS[data.verdict];
   const label = VERDICT_LABELS[data.verdict];
 
-  if (data.loading) {
-    return `
-      <div class="cici-tooltip" style="border-left-color: #D0D5DD;">
-        <div class="cici-tooltip__header">
-          <span class="cici-tooltip__spinner"></span>
-          <span class="cici-tooltip__title">Analyzing…</span>
-        </div>
-        <div class="cici-tooltip__url">${escapeHtml(truncateUrl(data.url))}</div>
-      </div>
-    `;
-  }
+  template.innerHTML = TOOLTIP_TEMPLATE_HTML;
+  const content = template.content;
+
+  // Apply styles via DOM API (safe — rejects invalid CSS values)
+  (content.querySelector(".cici-tooltip") as HTMLElement).style.borderLeftColor = color;
+  (content.querySelector(".cici-tooltip__dot") as HTMLElement).style.background = color;
+
+  // Populate dynamic values via textContent (XSS-safe)
+  content.querySelector(".cici-tooltip__title")!.textContent = label;
+  content.querySelector(".cici-tooltip__confidence")!.textContent = CONFIDENCE_LABELS[data.confidence] ?? "";
+  content.querySelector(".cici-tooltip__summary")!.textContent = data.summary;
 
   const domainAge = data.domain_age_days !== null
     ? `${data.domain_age_days} day${data.domain_age_days !== 1 ? "s" : ""} old`
     : "Unknown age";
+  content.querySelector(".cici-tooltip__domain-age")!.textContent = domainAge;
+  content.querySelector(".cici-tooltip__url")!.textContent = truncateUrl(data.url);
 
-  return `
-    <div class="cici-tooltip" style="border-left-color: ${color};">
-      <div class="cici-tooltip__header">
-        <span class="cici-tooltip__dot" style="background: ${color};"></span>
-        <span class="cici-tooltip__title">${label}</span>
-        <span class="cici-tooltip__confidence">${CONFIDENCE_LABELS[data.confidence] ?? ""}</span>
-      </div>
-      <div class="cici-tooltip__summary">${escapeHtml(data.summary)}</div>
-      <div class="cici-tooltip__meta">
-        <span class="cici-tooltip__domain-age">${domainAge}</span>
-      </div>
-      <div class="cici-tooltip__url">${escapeHtml(truncateUrl(data.url))}</div>
-    </div>
-  `;
+  return content;
 }
 
 function getTooltipCSS(): string {
@@ -148,14 +173,8 @@ function getTooltipCSS(): string {
   `;
 }
 
-function escapeHtml(str: string): string {
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
-}
-
 function truncateUrl(url: string, max = 60): string {
-  return url.length > max ? url.slice(0, max) + "…" : url;
+  return url.length > max ? url.slice(0, max) + "\u2026" : url;
 }
 
 export function showTooltip(x: number, y: number, data: TooltipData): void {
@@ -170,7 +189,7 @@ export function showTooltip(x: number, y: number, data: TooltipData): void {
   shadow.appendChild(style);
 
   const container = document.createElement("div");
-  container.innerHTML = buildTooltipHTML(data);
+  container.appendChild(buildTooltipDOM(data));
   shadow.appendChild(container);
 
   document.body.appendChild(host);
@@ -206,13 +225,9 @@ export function updateTooltip(data: TooltipData): void {
   const container = host.shadowRoot.querySelector("div:not(style)") as HTMLElement | null;
   if (!container) return;
 
-  const color = VERDICT_COLORS[data.verdict];
-  container.innerHTML = buildTooltipHTML(data);
-
-  const tooltip = container.querySelector(".cici-tooltip") as HTMLElement | null;
-  if (tooltip) {
-    tooltip.style.borderLeftColor = color;
-  }
+  // Clear and rebuild with safe DOM construction
+  container.replaceChildren();
+  container.appendChild(buildTooltipDOM(data));
 }
 
 export function removeTooltip(): void {
